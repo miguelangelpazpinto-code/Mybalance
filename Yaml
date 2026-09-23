@@ -35,5 +35,4 @@ jobs:
       with:
         name: MiBalance-APK
         path: "**/build/outputs/apk/debug/*.apk"
-
         
