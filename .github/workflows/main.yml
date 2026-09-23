@@ -1,30 +1,38 @@
-name: Compilar APK                                     │
-│      on:                                                    │
-│        push:                                                │
-│          branches: [ "main" ]                               │
-│        workflow_dispatch:                                   │
-│      permissions:                                           │
-│        contents: read                                       │
-│      jobs:                                                  │
-│        build:                                               │
-│          runs-on: ubuntu-latest                             │
-│          steps:                                             │
-│          - uses: actions/checkout@v4                        │
-│          - name: Descomprimir                               │
-│            run: unzip -q MiBalance-actualizado.zip          │
-│          - uses: actions/setup-java@v4                      │
-│            with:                                            │
-│              distribution: 'temurin'                        │
-│              java-version: '17'                             │
-│          - uses: gradle/actions/setup-gradle@v4             │
-│            with:                                            │
-│              gradle-version: '8.5'                          │
-│          - name: Compilar                                   │
-│            run: |                                           │
-│              cd MiBalance                                   │
-│              gradle assembleDebug --stacktrace              │
-│          - uses: actions/upload-artifact@v4                 │
-│            if: always()                                     │
-│            with:                                            │
-│              name: MiBalance-APK                            │
-│              path: "**/build/outputs/apk/**/*.apk"  
+name: Compilar APK
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Descomprimir
+        run: unzip -q MiBalance-actualizado.zip
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.5
+
+      - name: Compilar
+        run: |
+          cd MiBalance
+          gradle assembleDebug --no-daemon
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiBalance-APK
+          path: MiBalance/app/build/outputs/apk/debug/*.apk
+          
