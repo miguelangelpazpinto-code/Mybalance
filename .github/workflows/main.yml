@@ -1,0 +1,39 @@
+name: Compilar APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Descargar repositorio
+      uses: actions/checkout@v4
+
+    - name: Descomprimir proyecto
+      run: |
+        unzip MiBalance-actualizado.zip
+        find . -name "gradlew" -exec chmod +x {} +
+
+    - name: Configurar Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Compilar APK con Gradle
+      run: |
+        GRADLE_DIR=$(find . -name "gradlew" -printf '%h\n' | head -n 1)
+        cd "$GRADLE_DIR"
+        ./gradlew assembleDebug
+
+    - name: Subir APK generado
+      uses: actions/upload-artifact@v4
+      with:
+        name: MiBalance-APK
+        path: "**/build/outputs/apk/debug/*.apk"
+
+        
